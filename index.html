@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Recuperar acceso | AI Work LATAM</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0f172a;color:#e5e7eb;font-family:Arial,sans-serif;padding:24px}.card{width:min(100%,440px);background:#172033;border:1px solid #334155;border-radius:18px;padding:30px;box-shadow:0 20px 55px #0005}h1{font-size:25px;margin:0 0 8px}.sub{color:#aab7ca;line-height:1.5;margin:0 0 24px}label{display:block;margin:16px 0 7px;font-size:14px}input{width:100%;padding:13px;border-radius:9px;border:1px solid #475569;background:#0f172a;color:white;font-size:16px}button{width:100%;margin-top:22px;padding:14px;border:0;border-radius:9px;background:#7c3aed;color:white;font-weight:bold;font-size:16px;cursor:pointer}button:disabled{opacity:.55}.notice{margin-top:18px;padding:12px;border-radius:9px;line-height:1.45;display:none}.ok{display:block;background:#064e3b;color:#d1fae5}.err{display:block;background:#7f1d1d;color:#fee2e2}.muted{font-size:12px;color:#94a3b8;margin-top:18px}
+</style></head><body><main class="card"><h1>Restablecer contraseña</h1><p class="sub">AI Work LATAM · Crea una contraseña nueva para tu cuenta administradora.</p>
+<div id="loading" class="sub">Validando el enlace de recuperación…</div>
+<form id="form" hidden><label for="password">Nueva contraseña</label><input id="password" type="password" minlength="8" autocomplete="new-password" required placeholder="Mínimo 8 caracteres"><label for="confirm">Confirmar contraseña</label><input id="confirm" type="password" minlength="8" autocomplete="new-password" required placeholder="Escribe la contraseña otra vez"><button id="submit" type="submit">Guardar nueva contraseña</button></form>
+<div id="notice" class="notice" role="status"></div><p class="muted">Si el enlace expiró, solicita un nuevo correo de recuperación desde Supabase.</p></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+const SUPABASE_URL="https://gyugtjmqhcfecunrsmtl.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY="sb_publishable_RqEY_21m-NlgCmUPzZItRA_QT603Zqd";
+const client=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const loading=document.getElementById("loading"),form=document.getElementById("form"),notice=document.getElementById("notice"),submit=document.getElementById("submit");
+function show(message,kind){notice.textContent=message;notice.className="notice "+kind;}
+async function init(){const {data,error}=await client.auth.getSession();loading.hidden=true;if(error||!data.session){show("El enlace no es válido o ha expirado. Solicita un nuevo correo de recuperación y abre el enlace más reciente.","err");return;}form.hidden=false;}
+form.addEventListener("submit",async e=>{e.preventDefault();const password=document.getElementById("password").value,confirm=document.getElementById("confirm").value;if(password.length<8)return show("La contraseña debe tener al menos 8 caracteres.","err");if(password!==confirm)return show("Las contraseñas no coinciden.","err");submit.disabled=true;submit.textContent="Guardando…";const {error}=await client.auth.updateUser({password});submit.disabled=false;submit.textContent="Guardar nueva contraseña";if(error)return show("No se pudo actualizar la contraseña: "+error.message,"err");form.hidden=true;show("Contraseña actualizada correctamente. Ya puedes volver al administrador e iniciar sesión.","ok");});
+init();
+</script></body></html>
